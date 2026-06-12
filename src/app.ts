@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import { apiRoute } from "./routes/api.js";
 import { logging } from "./config/logging.js";

@@ -1,13 +1,18 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { ErrorRequestHandler } from "express";
-import { ResponseError } from "../exceptions/responseError.js";
+import { ExternalServiceError, ResponseError } from "../exceptions/responseError.js";
 import { logging } from "../config/logging.js";
 
-export const errorMiddleware: ErrorRequestHandler = (
-  error,
-  request,
-  response,
-  next,
-) => {
+export const errorMiddleware: ErrorRequestHandler = (error, request, response, next) => {
+  if (error instanceof ExternalServiceError) {
+    return response.status(error.status).json({
+      success: false,
+      type: "External Service Error",
+      message: error.message,
+      service: error.service,
+    });
+  }
+
   if (error instanceof ResponseError) {
     return response.status(error.status).json({
       success: false,

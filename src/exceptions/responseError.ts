@@ -6,3 +6,14 @@ export class ResponseError extends Error {
     super(message);
   }
 }
+
+export class ExternalServiceError extends Error {
+  constructor(
+    public status: number,
+    message: string,
+    public service?: string,
+  ) {
+    super(message);
+    this.name = "ExternalServiceError";
+  }
+}
