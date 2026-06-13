@@ -10,6 +10,7 @@ export type MovieServiceType = {
   getNowPlaying: (page: number) => Promise<MoviePaginatedResults>;
   getPopular: (page: number) => Promise<MoviePaginatedResults>;
   getDetail: (id: number) => Promise<MovieDetail>;
+  search: (query: string) => Promise<MoviePaginatedResults>;
 };
 
 export const MovieService = (): MovieServiceType => {
@@ -48,5 +49,17 @@ export const MovieService = (): MovieServiceType => {
     return MovieDetailSchema.parse(response.data);
   };
 
-  return { getNowPlaying, getPopular, getDetail };
+  const search = async (query: string) => {
+    const token = process.env.TMDB_TOKEN;
+    const response = await axios.get(`${process.env.TMDB_BASE_URL}/search/movie`, {
+      headers: { Authorization: `Bearer ${token}` },
+      params: {
+        query: query,
+      },
+    });
+
+    return MoviePaginatedSchema.parse(response.data);
+  };
+
+  return { getNowPlaying, getPopular, getDetail, search };
 };

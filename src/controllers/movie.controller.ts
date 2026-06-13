@@ -40,5 +40,20 @@ export const MovieController = (movieService: MovieServiceType) => {
     });
   };
 
-  return { getNowPlaying, getPopular, getDetail };
+  const search = async (req: Request, res: Response) => {
+    const query = req.query.query;
+    if (!query) {
+      throw new ResponseError(400, "Search query is required");
+    }
+
+    const results = await movieService.search(query as string);
+
+    return res.json({
+      success: true,
+      message: "Search movie success",
+      data: results,
+    });
+  };
+
+  return { getNowPlaying, getPopular, getDetail, search };
 };
