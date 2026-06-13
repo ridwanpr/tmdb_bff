@@ -5,19 +5,29 @@ import { ExternalServiceError, ResponseError } from "../exceptions/responseError
 import { logging } from "../config/logging.js";
 
 export const errorMiddleware: ErrorRequestHandler = (error, request, response, next) => {
+  const isDevEnv = process.env.NODE_ENV === "development";
+
   if (error instanceof z.ZodError) {
     const formattedErrors = error.issues.map((issue) => ({
       path: issue.path.join("."),
       message: issue.message,
     }));
 
+    if (isDevEnv) {
+      console.log(error);
+      logging.error(`Validation Error: ${error.message}`, {
+        errors: formattedErrors,
+        stack: error.stack,
+      });
+    }
+
     return response.status(400).json({
       success: false,
       type: "Validation Error",
       errors: formattedErrors,
+      ...(isDevEnv && { stack: error.stack }),
     });
   }
-
   if (error instanceof ExternalServiceError) {
     return response.status(error.status).json({
       success: false,
@@ -34,7 +44,6 @@ export const errorMiddleware: ErrorRequestHandler = (error, request, response, n
       message: error.message,
     });
   } else {
-    const isDevEnv = process.env.NODE_ENV === "development" ? true : false;
     if (isDevEnv) console.log(error);
 
     logging.error(error.message, { stack: error.stack });
