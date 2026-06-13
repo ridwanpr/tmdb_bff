@@ -16,7 +16,7 @@ export const createPaginatedResultsSchema = <T extends z.ZodTypeAny>(resultSchem
 
 export const MovieSummarySchema = z.object({
   adult: z.boolean(),
-  backdrop_path: z.string(),
+  backdrop_path: z.string().nullable(),
   genre_ids: z.array(z.number()),
   id: z.number(),
   title: z.string(),

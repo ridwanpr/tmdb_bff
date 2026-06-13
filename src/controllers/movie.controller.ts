@@ -3,7 +3,8 @@ import type { MovieServiceType } from "../services/movie.service.js";
 
 export const MovieController = (movieService: MovieServiceType) => {
   const getNowPlaying = async (req: Request, res: Response) => {
-    const results = await movieService.getNowPlaying();
+    const page = Number(req.query.page) || 1;
+    const results = await movieService.getNowPlaying(page);
 
     return res.json({
       success: true,
@@ -13,11 +14,12 @@ export const MovieController = (movieService: MovieServiceType) => {
   };
 
   const getPopular = async (req: Request, res: Response) => {
-    const results = await movieService.getPopular();
+    const page = Number(req.query.page) || 1;
+    const results = await movieService.getPopular(page);
 
     return res.json({
       success: true,
-      message: "Fetch now playing movies success",
+      message: "Fetch now popular movies success",
       data: results,
     });
   };
