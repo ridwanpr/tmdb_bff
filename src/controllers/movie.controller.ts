@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import type { MovieServiceType } from "../services/movie.service.js";
+import { ResponseError } from "../exceptions/responseError.js";
 
 export const MovieController = (movieService: MovieServiceType) => {
   const getNowPlaying = async (req: Request, res: Response) => {
@@ -24,5 +25,20 @@ export const MovieController = (movieService: MovieServiceType) => {
     });
   };
 
-  return { getNowPlaying, getPopular };
+  const getDetail = async (req: Request, res: Response) => {
+    const id = Number(req.params.id);
+    if (isNaN(id)) {
+      throw new ResponseError(400, "ID Param is not a valid number");
+    }
+
+    const results = await movieService.getDetail(id);
+
+    return res.json({
+      success: true,
+      message: "Fetch movie detail success",
+      data: results,
+    });
+  };
+
+  return { getNowPlaying, getPopular, getDetail };
 };

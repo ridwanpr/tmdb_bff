@@ -1,9 +1,15 @@
 import axios from "axios";
-import { MoviePaginatedSchema, type MoviePaginatedResults } from "../models/movie.model.js";
+import {
+  MovieDetailSchema,
+  MoviePaginatedSchema,
+  type MovieDetail,
+  type MoviePaginatedResults,
+} from "../models/movie.model.js";
 
 export type MovieServiceType = {
   getNowPlaying: (page: number) => Promise<MoviePaginatedResults>;
   getPopular: (page: number) => Promise<MoviePaginatedResults>;
+  getDetail: (id: number) => Promise<MovieDetail>;
 };
 
 export const MovieService = (): MovieServiceType => {
@@ -33,5 +39,14 @@ export const MovieService = (): MovieServiceType => {
     return MoviePaginatedSchema.parse(response.data);
   };
 
-  return { getNowPlaying, getPopular };
+  const getDetail = async (id: number) => {
+    const token = process.env.TMDB_TOKEN;
+    const response = await axios.get(`${process.env.TMDB_BASE_URL}/movie/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    return MovieDetailSchema.parse(response.data);
+  };
+
+  return { getNowPlaying, getPopular, getDetail };
 };
