@@ -7,9 +7,20 @@ export const MovieController = (movieService: MovieServiceType) => {
 
     return res.json({
       success: true,
+      message: "Fetch now playing movies success",
       data: results,
     });
   };
 
-  return { getNowPlaying };
+  const getPopular = async (req: Request, res: Response) => {
+    const results = await movieService.getPopular();
+
+    return res.json({
+      success: true,
+      message: "Fetch now playing movies success",
+      data: results,
+    });
+  };
+
+  return { getNowPlaying, getPopular };
 };

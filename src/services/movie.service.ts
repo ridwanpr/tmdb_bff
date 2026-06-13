@@ -4,6 +4,7 @@ import type { MovieSummary } from "../models/movie.model.js";
 
 export type MovieServiceType = {
   getNowPlaying: () => Promise<PaginatedResults<MovieSummary>>;
+  getPopular: () => Promise<PaginatedResults<MovieSummary>>;
 };
 
 export const MovieService = (): MovieServiceType => {
@@ -19,5 +20,17 @@ export const MovieService = (): MovieServiceType => {
     return response.data;
   };
 
-  return { getNowPlaying };
+  const getPopular = async () => {
+    const token = process.env.TMDB_TOKEN;
+    const response = await axios.get<PaginatedResults<MovieSummary>>(
+      `${process.env.TMDB_BASE_URL}/movie/popular`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
+
+    return response.data;
+  };
+
+  return { getNowPlaying, getPopular };
 };

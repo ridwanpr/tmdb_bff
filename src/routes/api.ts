@@ -12,5 +12,6 @@ apiRoute.get("/", (req, res) => {
 });
 
 apiRoute.get("/now-playing", movieController.getNowPlaying);
+apiRoute.get("/popular", movieController.getPopular);
 
 export { apiRoute };
