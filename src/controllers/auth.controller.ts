@@ -1,21 +1,27 @@
-import bcrypt from "bcrypt";
 import { auth } from "../lib/auth.js";
 import type { Request, Response } from "express";
-import { signUpSchema } from "../schema/auth.schema.js";
+import { loginSchema, signUpSchema } from "../schema/auth.schema.js";
+import { fromNodeHeaders } from "better-auth/node";
 
 export const AuthController = () => {
   const signUp = async (req: Request, res: Response) => {
     const body = signUpSchema.parse(req.body);
 
-    const password = await bcrypt.hash(body.password, 12);
-
-    const data = await auth.api.signUpEmail({
+    const authResponse = await auth.api.signUpEmail({
       body: {
         name: body.name,
         email: body.email,
-        password: password,
+        password: body.password,
       },
+      headers: fromNodeHeaders(req.headers),
+      asResponse: true,
     });
+
+    authResponse.headers.forEach((value, key) => {
+      res.setHeader(key, value);
+    });
+
+    const data = await authResponse.json();
 
     return res.json({
       success: true,
@@ -24,5 +30,31 @@ export const AuthController = () => {
     });
   };
 
-  return { signUp };
+  const login = async (req: Request, res: Response) => {
+    const body = loginSchema.parse(req.body);
+
+    const authResponse = await auth.api.signInEmail({
+      body: {
+        email: body.email,
+        password: body.password,
+        callbackURL: "/",
+      },
+      headers: fromNodeHeaders(req.headers),
+      asResponse: true,
+    });
+
+    authResponse.headers.forEach((value, key) => {
+      res.setHeader(key, value);
+    });
+
+    const data = await authResponse.json();
+
+    return res.json({
+      success: true,
+      message: "Login success",
+      data: data,
+    });
+  };
+
+  return { signUp, login };
 };

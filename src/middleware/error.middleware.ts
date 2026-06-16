@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { ErrorRequestHandler } from "express";
 import { ZodError } from "zod";
-import { ExternalServiceError, ResponseError } from "../exceptions/responseError.js";
+import { isAPIError } from "better-auth/api";
 import { logging } from "../config/logging.js";
+import type { ErrorRequestHandler } from "express";
+import { ExternalServiceError, ResponseError } from "../exceptions/responseError.js";
 
 export const errorMiddleware: ErrorRequestHandler = (error, request, response, next) => {
   const isDevEnv = process.env.NODE_ENV === "development";
@@ -42,6 +43,16 @@ export const errorMiddleware: ErrorRequestHandler = (error, request, response, n
       type: "External Service Error",
       message: error.message,
       service: error.service,
+    });
+  }
+
+  if (isAPIError(error)) {
+    if (isDevEnv) console.error(error);
+
+    return response.status(error.statusCode).json({
+      success: false,
+      type: "Authentication Error",
+      message: error.message,
     });
   }
 

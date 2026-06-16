@@ -20,5 +20,6 @@ apiRoute.get("/movie/:id", movieController.getDetail);
 apiRoute.get("/search/movie", movieController.search);
 
 apiRoute.post("/signup", authController.signUp);
+apiRoute.post("/login", authController.login);
 
 export { apiRoute };
