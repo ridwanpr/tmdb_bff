@@ -1,7 +1,7 @@
-import { auth } from "../lib/auth.js";
 import type { Request, Response } from "express";
-import { loginSchema, signUpSchema } from "../schema/auth.schema.js";
+import { auth } from "../lib/auth.js";
 import { fromNodeHeaders } from "better-auth/node";
+import { loginSchema, signUpSchema } from "../schema/auth.schema.js";
 
 export const AuthController = () => {
   const signUp = async (req: Request, res: Response) => {

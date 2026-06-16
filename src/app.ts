@@ -7,7 +7,6 @@ import { logging } from "./config/logging.js";
 import { errorMiddleware } from "./middleware/error.middleware.js";
 
 const app = express();
-app.use(cookieParser());
 const PORT = 3000;
 
 app.use(
@@ -16,6 +15,8 @@ app.use(
     credentials: true,
   }),
 );
+
+app.use(cookieParser());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
