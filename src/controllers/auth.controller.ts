@@ -56,5 +56,21 @@ export const AuthController = () => {
     });
   };
 
-  return { signUp, login };
+  const logout = async (req: Request, res: Response) => {
+    const authResponse = await auth.api.signOut({
+      headers: fromNodeHeaders(req.headers),
+      asResponse: true,
+    });
+
+    authResponse.headers.forEach((value, key) => {
+      res.setHeader(key, value);
+    });
+
+    return res.json({
+      success: true,
+      message: "Logout success",
+    });
+  };
+
+  return { signUp, login, logout };
 };
