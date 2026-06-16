@@ -4,7 +4,7 @@ import {
   MoviePaginatedSchema,
   type MovieDetail,
   type MoviePaginatedResults,
-} from "../models/movie.model.js";
+} from "../schema/movie.schema.js";
 
 export type MovieServiceType = {
   getNowPlaying: (page: number) => Promise<MoviePaginatedResults>;

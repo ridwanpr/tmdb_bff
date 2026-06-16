@@ -1,33 +1,41 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { ErrorRequestHandler } from "express";
-import { z } from "zod";
+import { ZodError } from "zod";
 import { ExternalServiceError, ResponseError } from "../exceptions/responseError.js";
 import { logging } from "../config/logging.js";
 
 export const errorMiddleware: ErrorRequestHandler = (error, request, response, next) => {
   const isDevEnv = process.env.NODE_ENV === "development";
 
-  if (error instanceof z.ZodError) {
-    const formattedErrors = error.issues.map((issue) => ({
-      path: issue.path.join("."),
-      message: issue.message,
-    }));
+  if (error instanceof ZodError || error?.name === "ZodError") {
+    const zodError = error as ZodError;
+
+    const details = zodError.issues.map((issue) => {
+      if (issue.path.length === 0 && issue.code === "invalid_type") {
+        return {
+          field: "body",
+          message: "Request body is required",
+        };
+      }
+      return {
+        field: issue.path.join(".") || "unknown",
+        message: issue.message,
+      };
+    });
 
     if (isDevEnv) {
-      console.log(error);
-      logging.error(`Validation Error: ${error.message}`, {
-        errors: formattedErrors,
-        stack: error.stack,
-      });
+      console.error(zodError);
+      logging.error(`Validation Error`, { errors: details });
     }
 
     return response.status(400).json({
       success: false,
       type: "Validation Error",
-      errors: formattedErrors,
-      ...(isDevEnv && { stack: error.stack }),
+      message: "The provided request payload is invalid.",
+      errors: details,
     });
   }
+
   if (error instanceof ExternalServiceError) {
     return response.status(error.status).json({
       success: false,
