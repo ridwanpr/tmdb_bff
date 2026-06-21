@@ -9,6 +9,6 @@ export const hashValue = async (value: string) => {
   });
 };
 
-export const verifyValue = async (rawValue: string, hashedValue: string) => {
+export const verifyValue = async (hashedValue: string, rawValue: string) => {
   return await verify(hashedValue, rawValue);
 };

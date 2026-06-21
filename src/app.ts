@@ -1,7 +1,8 @@
 import "dotenv/config";
-import express from "express";
-import cookieParser from "cookie-parser";
 import cors from "cors";
+import express from "express";
+import session from "express-session";
+import cookieParser from "cookie-parser";
 import { apiRoute } from "./routes/api.js";
 import { logging } from "./config/logging.js";
 import { errorMiddleware } from "./middleware/error.middleware.js";
@@ -13,6 +14,15 @@ app.use(
   cors({
     origin: "http://localhost:5173",
     credentials: true,
+  }),
+);
+
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET!,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false, httpOnly: true, maxAge: 60 * 60 * 24000 * 7 }, // 7 day
   }),
 );
 
