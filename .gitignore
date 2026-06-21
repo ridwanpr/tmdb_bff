@@ -3,3 +3,4 @@ node_modules
 dist
 storage/logs
 /src/generated/prisma
+/prisma/migrations

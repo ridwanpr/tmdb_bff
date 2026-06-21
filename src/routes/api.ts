@@ -15,7 +15,7 @@ apiRoute.get("/", (req, res) => {
   res.send("hello world");
 });
 
-apiRoute.get("/now-playing", authMiddleware, movieController.getNowPlaying);
+apiRoute.get("/now-playing", movieController.getNowPlaying);
 apiRoute.get("/popular", movieController.getPopular);
 apiRoute.get("/movie/:id", movieController.getDetail);
 apiRoute.get("/search/movie", movieController.search);
