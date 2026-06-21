@@ -23,6 +23,7 @@ model Session {
   id            String   @id @default(uuid())
   session_token String   @unique
   user_id       Int
+  is_revoked    Boolean  @default(false)
   expires_at    DateTime
   created_at    DateTime @default(now())
 
