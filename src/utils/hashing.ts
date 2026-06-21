@@ -4,8 +4,8 @@ export const hashValue = async (value: string) => {
   return await hash(value, {
     algorithm: 2, // argon2id
     memoryCost: 19456, // 19mb
-    timeCost: 3,
-    parallelism: 2,
+    timeCost: 2,
+    parallelism: 1,
   });
 };
 
