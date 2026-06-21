@@ -26,7 +26,6 @@ export const AuthController = (authService: AuthServiceType) => {
       success: true,
       message: "Login success",
       data: result.user,
-      token: result.sessionToken,
     });
   };
 
