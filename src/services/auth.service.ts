@@ -8,6 +8,7 @@ import { hashValue, verifyValue } from "../utils/hashing.js";
 export type AuthServiceType = {
   registerUser: (data: SignUp) => Promise<Omit<User, "password">>;
   loginUser: (data: Login) => Promise<{ user: Omit<User, "password">; sessionToken: string }>;
+  logoutUser: (token: string | undefined) => Promise<void>;
 };
 
 export const AuthService = (): AuthServiceType => {
@@ -29,9 +30,7 @@ export const AuthService = (): AuthServiceType => {
     const DUMMY_HASH = process.env.ARGON2_DUMMY_HASH!;
 
     const user = await prisma.user.findUnique({
-      where: {
-        email: data.email,
-      },
+      where: { email: data.email },
     });
 
     const hashToVerify = user ? user.password : DUMMY_HASH;
@@ -62,5 +61,13 @@ export const AuthService = (): AuthServiceType => {
     };
   };
 
-  return { registerUser, loginUser };
+  const logoutUser = async (token: string | undefined) => {
+    if (!token) return;
+
+    await prisma.session.deleteMany({
+      where: { session_token: token },
+    });
+  };
+
+  return { registerUser, loginUser, logoutUser };
 };

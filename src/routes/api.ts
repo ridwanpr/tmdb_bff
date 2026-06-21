@@ -14,7 +14,7 @@ const authService = AuthService();
 const movieController = MovieController(movieService);
 const authController = AuthController(authService);
 
-apiRoute.get("/", (req, res) => {
+apiRoute.get("/", authMiddleware, (req, res) => {
   res.send("hello world");
 });
 

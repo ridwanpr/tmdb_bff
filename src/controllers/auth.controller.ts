@@ -30,6 +30,16 @@ export const AuthController = (authService: AuthServiceType) => {
   };
 
   const logout = async (req: Request, res: Response) => {
+    const token = req.cookies?.session_token;
+
+    await authService.logoutUser(token);
+
+    res.clearCookie("session_token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+
     return res.json({
       success: true,
       message: "Logout success",
