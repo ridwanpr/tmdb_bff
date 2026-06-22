@@ -4,6 +4,17 @@ import { logging } from "../config/logging.js";
 import type { ErrorRequestHandler } from "express";
 import { ExternalServiceError, ResponseError } from "../exceptions/responseError.js";
 
+const HTTP_STATUS_TYPES: Record<number, string> = {
+  400: "Bad Request",
+  401: "Unauthorized",
+  403: "Forbidden",
+  404: "Not Found",
+  408: "Request Timeout",
+  409: "Conflict",
+  422: "Unprocessable Entity",
+  429: "Too Many Requests",
+};
+
 export const errorMiddleware: ErrorRequestHandler = (error, request, response, next) => {
   const isDevEnv = process.env.NODE_ENV === "development";
 
@@ -46,9 +57,11 @@ export const errorMiddleware: ErrorRequestHandler = (error, request, response, n
   }
 
   if (error instanceof ResponseError) {
+    const errorType = HTTP_STATUS_TYPES[error.status] || "Response Error";
+
     return response.status(error.status).json({
       success: false,
-      type: "Response error",
+      type: errorType,
       message: error.message,
     });
   } else {

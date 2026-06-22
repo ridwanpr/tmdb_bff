@@ -13,6 +13,16 @@ export type AuthServiceType = {
 
 export const AuthService = (): AuthServiceType => {
   const registerUser = async (data: SignUp) => {
+    const user = await prisma.user.findUnique({
+      where: {
+        email: data.email,
+      },
+    });
+
+    if (user) {
+      throw new ResponseError(409, "Email already registered");
+    }
+
     const hashPassword = await hashValue(data.password);
     return await prisma.user.create({
       data: {
