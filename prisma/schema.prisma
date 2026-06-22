@@ -8,13 +8,14 @@ datasource db {
 }
 
 model User {
-  id         String    @id @default(uuid(7)) @db.Char(36)
+  id         String     @id @default(uuid(7)) @db.Char(36)
   name       String
-  email      String    @unique
+  email      String     @unique
   password   String
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
   sessions   Session[]
+  userRoles  UserRole[]
 
   @@map("user")
 }
@@ -27,28 +28,54 @@ model Session {
   expires_at    DateTime
   created_at    DateTime @default(now())
 
-  user          User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
+  @@index([user_id])
   @@map("session")
 }
 
 model Role {
-  id String @id @default(uuid(7)) @db.Char(36)
-  name String @unique
-  description String? @db.Text
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  id              String           @id @default(uuid(7)) @db.Char(36)
+  name            String           @unique
+  description     String?          @db.Text
+  created_at      DateTime         @default(now())
+  updated_at      DateTime         @updatedAt
+  userRoles       UserRole[]
+  rolePermissions RolePermission[]
 
   @@map("role")
 }
 
 model Permission {
-  id String @id @default(uuid(7)) @db.Char(36)
-  slug String @unique
-  name String
-  description String? @db.Text
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  id              String           @id @default(uuid(7)) @db.Char(36)
+  slug            String           @unique
+  name            String
+  description     String?          @db.Text
+  created_at      DateTime         @default(now())
+  updated_at      DateTime         @updatedAt
+  rolePermissions RolePermission[]
 
   @@map("permission")
+}
+
+model RolePermission {
+  role_id       String     @db.Char(36)
+  permission_id String     @db.Char(36)
+  role          Role       @relation(fields: [role_id], references: [id], onDelete: Cascade)
+  permission    Permission @relation(fields: [permission_id], references: [id], onDelete: Cascade)
+
+  @@id([role_id, permission_id])
+  @@index([permission_id])
+  @@map("role_permission")
+}
+
+model UserRole {
+  role_id String @db.Char(36)
+  user_id String @db.Char(36)
+  role    Role   @relation(fields: [role_id], references: [id], onDelete: Cascade)
+  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@id([role_id, user_id])
+  @@index([user_id])
+  @@map("user_role")
 }
