@@ -27,13 +27,15 @@ export const AuthService = (): AuthServiceType => {
   };
 
   const loginUser = async (data: Login) => {
-    const DUMMY_HASH = process.env.ARGON2_DUMMY_HASH!;
+    const DUMMY_HASH =
+      "$argon2id$v=19$m=19456,t=2,p=1$YkNPVlVCRFU0aUlkdnNucQ$EmeawRu874p4GbX6T0ev+A";
 
     const user = await prisma.user.findUnique({
       where: { email: data.email },
     });
 
     const hashToVerify = user ? user.password : DUMMY_HASH;
+
     const verifyPassword = await verifyValue(hashToVerify, data.password);
 
     if (!user || !verifyPassword) {
