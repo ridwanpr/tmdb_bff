@@ -1,4 +1,5 @@
 import { prisma } from "../src/lib/prisma.js";
+import { hashValue } from "../src/utils/hashing.js";
 
 async function main() {
   const defaultRoles = [
@@ -106,6 +107,7 @@ async function main() {
 
   const superAdminRole = roles.find((r) => r.name === "Super Admin");
   const adminRole = roles.find((r) => r.name === "Admin");
+  const userRole = roles.find((r) => r.name === "User");
 
   const rolePermissionsData: { role_id: string; permission_id: string }[] = [];
 
@@ -133,6 +135,48 @@ async function main() {
     data: rolePermissionsData,
     skipDuplicates: true,
   });
+
+  const defaultUsers = [
+    {
+      name: "Super Admin",
+      email: "super@local.app",
+      password: "@SupLocS3rvr*#",
+      roleId: superAdminRole!.id,
+    },
+    {
+      name: "Admin User",
+      email: "admin@local.app",
+      password: "@AdmLocS3rvr*#",
+      roleId: adminRole!.id,
+    },
+    {
+      name: "Regular User",
+      email: "user@local.app",
+      password: "user@123*#",
+      roleId: userRole!.id,
+    },
+  ];
+
+  for (const userData of defaultUsers) {
+    if (!userData.roleId) continue;
+
+    const hashedPassword = await hashValue(userData.password);
+
+    await prisma.user.upsert({
+      where: { email: userData.email },
+      update: {},
+      create: {
+        name: userData.name,
+        email: userData.email,
+        password: hashedPassword,
+        userRoles: {
+          create: {
+            role_id: userData.roleId,
+          },
+        },
+      },
+    });
+  }
 }
 
 main()
