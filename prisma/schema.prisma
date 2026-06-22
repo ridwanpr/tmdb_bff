@@ -31,3 +31,24 @@ model Session {
 
   @@map("session")
 }
+
+model Role {
+  id String @id @default(uuid(7)) @db.Char(36)
+  name String @unique
+  description String? @db.Text
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("role")
+}
+
+model Permission {
+  id String @id @default(uuid(7)) @db.Char(36)
+  slug String @unique
+  name String
+  description String? @db.Text
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("permission")
+}
