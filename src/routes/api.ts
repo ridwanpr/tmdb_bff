@@ -23,11 +23,11 @@ apiRoute.get("/", authMiddleware, (req, res) => {
   res.send("hello world");
 });
 
-apiRoute.post("/register", validate(signUpSchema), authController.signUp);
-apiRoute.post("/login", validate(loginSchema), authController.login);
+apiRoute.post("/register", validate({ body: signUpSchema }), authController.signUp);
+apiRoute.post("/login", validate({ body: loginSchema }), authController.login);
 apiRoute.post("/logout", authMiddleware, authController.logout);
 
-apiRoute.post("/role", authMiddleware, validate(createRoleSchema), roleController.store);
+apiRoute.post("/role", authMiddleware, validate({ body: createRoleSchema }), roleController.store);
 
 apiRoute.get("/now-playing", movieController.getNowPlaying);
 apiRoute.get("/popular", movieController.getPopular);

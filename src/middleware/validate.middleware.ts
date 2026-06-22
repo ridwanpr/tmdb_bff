@@ -1,9 +1,27 @@
 import type { NextFunction, Request, Response } from "express";
 import type { ZodType } from "zod";
 
-export const validate = (schema: ZodType) => {
+interface RequestSchemas {
+  body?: ZodType;
+  query?: ZodType;
+  params?: ZodType;
+}
+
+export const validate = (schemas: RequestSchemas) => {
   return async (req: Request, res: Response, next: NextFunction) => {
-    req.body = await schema.parseAsync(req.body);
-    next();
+    try {
+      if (schemas.body) {
+        req.body = await schemas.body.parseAsync(req.body);
+      }
+      if (schemas.query) {
+        req.query = (await schemas.query.parseAsync(req.query)) as typeof req.query;
+      }
+      if (schemas.params) {
+        req.params = (await schemas.params.parseAsync(req.params)) as typeof req.params;
+      }
+      next();
+    } catch (err) {
+      next(err);
+    }
   };
 };
