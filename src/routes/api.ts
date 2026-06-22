@@ -7,7 +7,7 @@ import { validate } from "../middleware/validate.middleware.js";
 import { loginSchema, signUpSchema } from "../schema/auth.schema.js";
 import { AuthService } from "../services/auth.service.js";
 import { RoleController } from "../controllers/role.controller.js";
-import { createRoleSchema } from "../schema/role.schema.js";
+import { createRoleSchema, editRoleSchema, roleParamsSchema } from "../schema/role.schema.js";
 import { RoleService } from "../services/role.service.js";
 
 const apiRoute: Router = Router();
@@ -28,6 +28,12 @@ apiRoute.post("/login", validate({ body: loginSchema }), authController.login);
 apiRoute.post("/logout", authMiddleware, authController.logout);
 
 apiRoute.post("/role", authMiddleware, validate({ body: createRoleSchema }), roleController.store);
+apiRoute.put(
+  "/role/:id",
+  authMiddleware,
+  validate({ params: roleParamsSchema, body: editRoleSchema }),
+  roleController.update,
+);
 
 apiRoute.get("/now-playing", movieController.getNowPlaying);
 apiRoute.get("/popular", movieController.getPopular);

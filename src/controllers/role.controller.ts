@@ -13,5 +13,15 @@ export const RoleController = (roleService: RoleServiceType) => {
     });
   };
 
-  return { store };
+  const update = async (req: AuthenticatedRequest, res: Response) => {
+    const result = await roleService.editRole({ ...req.params, ...req.body });
+
+    return res.json({
+      success: true,
+      message: "Update role succeess",
+      data: result,
+    });
+  };
+
+  return { store, update };
 };

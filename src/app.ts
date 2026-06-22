@@ -10,6 +10,8 @@ import { errorMiddleware } from "./middleware/error.middleware.js";
 const app = express();
 const PORT = 3000;
 
+app.use(cookieParser());
+
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -25,8 +27,6 @@ app.use(
     cookie: { secure: false, httpOnly: true, maxAge: 60 * 60 * 24000 * 7 }, // 7 day
   }),
 );
-
-app.use(cookieParser());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
