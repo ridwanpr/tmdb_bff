@@ -69,5 +69,6 @@ apiRoute.get("/search/movie", movieController.search);
 
 // Watchlist Routes
 apiRoute.post("/watchlist", authMiddleware, watchlistController.store);
+apiRoute.put("/watchlist/:id", authMiddleware, watchlistController.update);
 
 export { apiRoute };
