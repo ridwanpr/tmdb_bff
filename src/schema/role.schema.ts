@@ -17,9 +17,13 @@ export const roleParamsSchema = z.object({
 
 export type CreateRole = z.infer<typeof createRoleSchema>;
 export type EditRole = z.infer<typeof editRoleSchema>;
-export type EditRoleParams = z.infer<typeof roleParamsSchema>;
+export type RoleParams = z.infer<typeof roleParamsSchema>;
 
 export type EditRoleRequest = AuthenticatedRequest & {
-  params: EditRoleParams;
+  params: RoleParams;
   body: EditRole;
+};
+
+export type DeleteRoleRequest = AuthenticatedRequest & {
+  params: RoleParams;
 };

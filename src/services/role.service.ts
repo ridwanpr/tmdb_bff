@@ -1,12 +1,12 @@
 import { ResponseError } from "../exceptions/responseError.js";
 import type { Role } from "../generated/prisma/client.js";
 import { prisma } from "../lib/prisma.js";
-import type { CreateRole, EditRole, EditRoleParams } from "../schema/role.schema.js";
+import type { CreateRole, EditRole, RoleParams } from "../schema/role.schema.js";
 
 export type RoleServiceType = {
   createRole: (data: CreateRole) => Promise<Role>;
-  editRole: (id: EditRoleParams, data: EditRole) => Promise<Role>;
-  deleteRole: (id: string) => Promise<Role>;
+  editRole: (param: RoleParams, data: EditRole) => Promise<Role>;
+  deleteRole: (param: RoleParams) => Promise<Role>;
 };
 
 export const RoleService = () => {
@@ -26,7 +26,7 @@ export const RoleService = () => {
     });
   };
 
-  const editRole = async (param: EditRoleParams, data: EditRole) => {
+  const editRole = async (param: RoleParams, data: EditRole) => {
     const roleExists = await prisma.role.findFirst({
       where: {
         name: data.name,
@@ -46,10 +46,10 @@ export const RoleService = () => {
     });
   };
 
-  const deleteRole = async (id: string) => {
+  const deleteRole = async (param: RoleParams) => {
     return await prisma.role.delete({
       where: {
-        id: id,
+        id: param.id,
       },
     });
   };

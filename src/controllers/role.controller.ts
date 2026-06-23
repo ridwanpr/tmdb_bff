@@ -1,7 +1,7 @@
 import type { Response } from "express";
 import type { AuthenticatedRequest } from "../middleware/auth.middleware.js";
 import type { RoleServiceType } from "../services/role.service.js";
-import type { EditRoleRequest } from "../schema/role.schema.js";
+import type { DeleteRoleRequest, EditRoleRequest } from "../schema/role.schema.js";
 
 export const RoleController = (roleService: RoleServiceType) => {
   const store = async (req: AuthenticatedRequest, res: Response) => {
@@ -24,5 +24,14 @@ export const RoleController = (roleService: RoleServiceType) => {
     });
   };
 
-  return { store, update };
+  const destroy = async (req: DeleteRoleRequest, res: Response) => {
+    await roleService.deleteRole(req.params);
+
+    return res.json({
+      success: true,
+      message: "Delete role succeess",
+    });
+  };
+
+  return { store, update, destroy };
 };
