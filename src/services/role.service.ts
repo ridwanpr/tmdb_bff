@@ -3,12 +3,22 @@ import type { Role } from "../generated/prisma/client.js";
 import { ResponseError } from "../exceptions/responseError.js";
 import type { CreateRole, EditRole, RoleParams } from "../schema/role.schema.js";
 
+type PaginatedRoles = {
+  roles: Role[];
+  meta: {
+    currentPage: number;
+    itemPerPage: number;
+    totalItems: number;
+    totalPages: number;
+  };
+};
+
 export type RoleServiceType = {
   createRole: (data: CreateRole) => Promise<Role>;
   editRole: (param: RoleParams, data: EditRole) => Promise<Role>;
   deleteRole: (param: RoleParams) => Promise<Role>;
   findRole: (param: RoleParams) => Promise<Role>;
-  listRoles: (page: number, itemPerPage: number) => Promise<Role[]>;
+  listRoles: (page: number, itemPerPage: number) => Promise<PaginatedRoles>;
 };
 
 export const RoleService = () => {
@@ -75,13 +85,28 @@ export const RoleService = () => {
   };
 
   const listRoles = async (page: number, itemPerPage: number) => {
-    return await prisma.role.findMany({
-      skip: (page - 1) * itemPerPage,
-      take: itemPerPage,
-      orderBy: {
-        id: "asc",
+    const [roles, totalItems] = await prisma.$transaction([
+      prisma.role.findMany({
+        skip: (page - 1) * itemPerPage,
+        take: itemPerPage,
+        orderBy: {
+          id: "asc",
+        },
+      }),
+      prisma.role.count(),
+    ]);
+
+    const totalPages = Math.ceil(totalItems / itemPerPage);
+
+    return {
+      roles,
+      meta: {
+        currentPage: page,
+        itemPerPage,
+        totalItems,
+        totalPages,
       },
-    });
+    };
   };
 
   return { createRole, editRole, deleteRole, findRole, listRoles };

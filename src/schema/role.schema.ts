@@ -1,5 +1,4 @@
 import z from "zod";
-import type { AuthenticatedRequest } from "../middleware/auth.middleware.js";
 
 export const createRoleSchema = z.object({
   name: z.string().min(2).max(255),
@@ -23,20 +22,3 @@ export const rolePaginateSchema = z.object({
 export type CreateRole = z.infer<typeof createRoleSchema>;
 export type EditRole = z.infer<typeof editRoleSchema>;
 export type RoleParams = z.infer<typeof roleParamsSchema>;
-
-export type EditRoleRequest = AuthenticatedRequest & {
-  params: RoleParams;
-  body: EditRole;
-};
-
-export type DeleteRoleRequest = AuthenticatedRequest & {
-  params: RoleParams;
-};
-
-export type ShowRoleRequest = AuthenticatedRequest & {
-  params: RoleParams;
-};
-
-export type IndexRoleRequest = AuthenticatedRequest & {
-  validatedQuery: z.infer<typeof rolePaginateSchema>;
-};
