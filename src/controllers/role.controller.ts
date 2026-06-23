@@ -1,6 +1,7 @@
 import type { Response } from "express";
 import type { AuthenticatedRequest } from "../middleware/auth.middleware.js";
 import type { RoleServiceType } from "../services/role.service.js";
+import type { EditRoleRequest } from "../schema/role.schema.js";
 
 export const RoleController = (roleService: RoleServiceType) => {
   const store = async (req: AuthenticatedRequest, res: Response) => {
@@ -13,8 +14,8 @@ export const RoleController = (roleService: RoleServiceType) => {
     });
   };
 
-  const update = async (req: AuthenticatedRequest, res: Response) => {
-    const result = await roleService.editRole({ ...req.params, ...req.body });
+  const update = async (req: EditRoleRequest, res: Response) => {
+    const result = await roleService.editRole(req.params, req.body);
 
     return res.json({
       success: true,
