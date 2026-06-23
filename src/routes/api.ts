@@ -9,6 +9,8 @@ import { RoleService } from "../services/role.service.js";
 import { accessMiddleware } from "../middleware/access.middleware.js";
 import { PermissionService } from "../services/permission.service.js";
 import { PermissionController } from "../controllers/permission.controller.js";
+import { WatchlistController } from "../controllers/watchlist.controller.js";
+import { WatchlistService } from "../services/watchlist.service.js";
 
 const apiRoute: Router = Router();
 
@@ -16,11 +18,13 @@ const movieService = MovieService();
 const authService = AuthService();
 const roleService = RoleService();
 const permissionService = PermissionService();
+const watchlistService = WatchlistService();
 
 const movieController = MovieController(movieService);
 const authController = AuthController(authService);
 const roleController = RoleController(roleService);
 const permissionController = PermissionController(permissionService);
+const watchlistController = WatchlistController(watchlistService);
 
 apiRoute.get("/", authMiddleware, (req, res) => {
   res.send("hello world");
@@ -62,5 +66,8 @@ apiRoute.get("/now-playing", movieController.getNowPlaying);
 apiRoute.get("/popular", movieController.getPopular);
 apiRoute.get("/movie/:id", movieController.getDetail);
 apiRoute.get("/search/movie", movieController.search);
+
+// Watchlist Routes
+apiRoute.post("/watchlist", authMiddleware, watchlistController.store);
 
 export { apiRoute };
