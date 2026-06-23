@@ -15,6 +15,11 @@ export const roleParamsSchema = z.object({
   id: z.uuid(),
 });
 
+export const rolePaginateSchema = z.object({
+  page: z.coerce.number().min(1).max(255).nullish(),
+  itemPerPage: z.coerce.number().min(1).max(255).nullish(),
+});
+
 export type CreateRole = z.infer<typeof createRoleSchema>;
 export type EditRole = z.infer<typeof editRoleSchema>;
 export type RoleParams = z.infer<typeof roleParamsSchema>;
@@ -26,4 +31,12 @@ export type EditRoleRequest = AuthenticatedRequest & {
 
 export type DeleteRoleRequest = AuthenticatedRequest & {
   params: RoleParams;
+};
+
+export type ShowRoleRequest = AuthenticatedRequest & {
+  params: RoleParams;
+};
+
+export type IndexRoleRequest = AuthenticatedRequest & {
+  validatedQuery: z.infer<typeof rolePaginateSchema>;
 };

@@ -40,6 +40,12 @@ apiRoute.delete(
   validate({ params: roleParamsSchema }),
   roleController.destroy,
 );
+apiRoute.get(
+  "/role/:id",
+  authMiddleware,
+  validate({ params: roleParamsSchema }),
+  roleController.show,
+);
 
 apiRoute.get("/now-playing", movieController.getNowPlaying);
 apiRoute.get("/popular", movieController.getPopular);

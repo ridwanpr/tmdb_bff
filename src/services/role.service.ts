@@ -1,12 +1,14 @@
-import { ResponseError } from "../exceptions/responseError.js";
-import type { Role } from "../generated/prisma/client.js";
 import { prisma } from "../lib/prisma.js";
+import type { Role } from "../generated/prisma/client.js";
+import { ResponseError } from "../exceptions/responseError.js";
 import type { CreateRole, EditRole, RoleParams } from "../schema/role.schema.js";
 
 export type RoleServiceType = {
   createRole: (data: CreateRole) => Promise<Role>;
   editRole: (param: RoleParams, data: EditRole) => Promise<Role>;
   deleteRole: (param: RoleParams) => Promise<Role>;
+  findRole: (param: RoleParams) => Promise<Role>;
+  listRoles: (page: number, itemPerPage: number) => Promise<Role[]>;
 };
 
 export const RoleService = () => {
@@ -64,5 +66,23 @@ export const RoleService = () => {
     });
   };
 
-  return { createRole, editRole, deleteRole };
+  const findRole = async (param: RoleParams) => {
+    return await prisma.role.findUniqueOrThrow({
+      where: {
+        id: param.id,
+      },
+    });
+  };
+
+  const listRoles = async (page: number, itemPerPage: number) => {
+    return await prisma.role.findMany({
+      skip: (page - 1) * itemPerPage,
+      take: itemPerPage,
+      orderBy: {
+        id: "asc",
+      },
+    });
+  };
+
+  return { createRole, editRole, deleteRole, findRole, listRoles };
 };

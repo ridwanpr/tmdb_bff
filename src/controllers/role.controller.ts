@@ -1,7 +1,11 @@
 import type { Response } from "express";
 import type { AuthenticatedRequest } from "../middleware/auth.middleware.js";
 import type { RoleServiceType } from "../services/role.service.js";
-import type { DeleteRoleRequest, EditRoleRequest } from "../schema/role.schema.js";
+import type {
+  DeleteRoleRequest,
+  EditRoleRequest,
+  ShowRoleRequest,
+} from "../schema/role.schema.js";
 
 export const RoleController = (roleService: RoleServiceType) => {
   const store = async (req: AuthenticatedRequest, res: Response) => {
@@ -9,7 +13,7 @@ export const RoleController = (roleService: RoleServiceType) => {
 
     return res.json({
       success: true,
-      message: "Create role succeess",
+      message: "Create role success",
       data: result,
     });
   };
@@ -19,7 +23,7 @@ export const RoleController = (roleService: RoleServiceType) => {
 
     return res.json({
       success: true,
-      message: "Update role succeess",
+      message: "Update role success",
       data: result,
     });
   };
@@ -29,9 +33,19 @@ export const RoleController = (roleService: RoleServiceType) => {
 
     return res.json({
       success: true,
-      message: "Delete role succeess",
+      message: "Delete role success",
     });
   };
 
-  return { store, update, destroy };
+  const show = async (req: ShowRoleRequest, res: Response) => {
+    const result = await roleService.findRole(req.params);
+
+    return res.json({
+      success: true,
+      message: "Find role success",
+      data: result,
+    });
+  };
+
+  return { store, update, destroy, show };
 };
