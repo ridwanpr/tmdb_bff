@@ -16,6 +16,7 @@ model User {
   updated_at DateTime   @updatedAt
   sessions   Session[]
   userRoles  UserRole[]
+  watchlists Watchlist[]
 
   @@map("user")
 }
@@ -79,4 +80,15 @@ model UserRole {
   @@id([role_id, user_id])
   @@index([user_id])
   @@map("user_role")
+}
+
+model Watchlist {
+  id String @id @default(uuid(7)) @db.Char(36)
+  user_id String @db.Char(36)
+  movie_id Int
+  score Int
+  note String @db.Text
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("watchlist")
 }
