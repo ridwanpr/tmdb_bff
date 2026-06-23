@@ -6,6 +6,7 @@ import { authMiddleware } from "../middleware/auth.middleware.js";
 import { AuthService } from "../services/auth.service.js";
 import { RoleController } from "../controllers/role.controller.js";
 import { RoleService } from "../services/role.service.js";
+import { accessMiddleware } from "../middleware/access.middleware.js";
 
 const apiRoute: Router = Router();
 
@@ -27,11 +28,16 @@ apiRoute.post("/login", authController.login);
 apiRoute.post("/logout", authMiddleware, authController.logout);
 
 // Role Routes
-apiRoute.post("/role", authMiddleware, roleController.store);
-apiRoute.put("/role/:id", authMiddleware, roleController.update);
-apiRoute.delete("/role/:id", authMiddleware, roleController.destroy);
-apiRoute.get("/role/:id", authMiddleware, roleController.show);
-apiRoute.get("/role", authMiddleware, roleController.index);
+apiRoute.post("/role", authMiddleware, accessMiddleware("role:create"), roleController.store);
+apiRoute.put("/role/:id", authMiddleware, accessMiddleware("role:edit"), roleController.update);
+apiRoute.delete(
+  "/role/:id",
+  authMiddleware,
+  accessMiddleware("role:delete"),
+  roleController.destroy,
+);
+apiRoute.get("/role/:id", authMiddleware, accessMiddleware("role:show"), roleController.show);
+apiRoute.get("/role", authMiddleware, accessMiddleware("role:list"), roleController.index);
 
 // Movie Routes
 apiRoute.get("/now-playing", movieController.getNowPlaying);
