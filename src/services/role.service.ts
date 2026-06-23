@@ -47,6 +47,16 @@ export const RoleService = () => {
   };
 
   const deleteRole = async (param: RoleParams) => {
+    const isSystemRole = await prisma.role.findUnique({
+      where: {
+        id: param.id,
+      },
+    });
+
+    if (isSystemRole?.is_system) {
+      throw new ResponseError(403, "System role can't be deleted");
+    }
+
     return await prisma.role.delete({
       where: {
         id: param.id,
