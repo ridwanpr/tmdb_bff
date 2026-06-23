@@ -4,8 +4,8 @@ import { hashValue } from "../src/utils/hashing.js";
 async function main() {
   const defaultRoles = [
     { name: "Super Admin", description: "Super Admin role", is_system: true },
-    { name: "Admin", description: "Admin role" },
-    { name: "User", description: "User role" },
+    { name: "User", description: "User role", is_system: true },
+    { name: "Admin", description: "Admin role", is_system: false },
   ];
 
   const defaultPermissions = [
