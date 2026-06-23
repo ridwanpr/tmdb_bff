@@ -1,10 +1,21 @@
 import { prisma } from "../lib/prisma.js";
 import { ResponseError } from "../exceptions/responseError.js";
-import type { AssignPermission } from "../schema/permission.schema.js";
-import type { RolePermission } from "../generated/prisma/client.js";
+import type { AssignPermission, RolePermissionParams } from "../schema/permission.schema.js";
+import type { Prisma, RolePermission } from "../generated/prisma/client.js";
+
+export type RoleWithPermissions = Prisma.RoleGetPayload<{
+  include: {
+    rolePermissions: {
+      include: {
+        permission: true;
+      };
+    };
+  };
+}>;
 
 export type PermissionServiceType = {
   assignPermissionToRole: (data: AssignPermission) => Promise<RolePermission[]>;
+  getRolePermission: (params: RolePermissionParams) => Promise<RoleWithPermissions | null>;
 };
 
 export const PermissionService = (): PermissionServiceType => {
@@ -54,5 +65,22 @@ export const PermissionService = (): PermissionServiceType => {
     });
   };
 
-  return { assignPermissionToRole };
+  const getRolePermission = async (params: RolePermissionParams) => {
+    const rolePermission = await prisma.role.findUnique({
+      where: {
+        id: params.role_id,
+      },
+      include: {
+        rolePermissions: {
+          include: {
+            permission: true,
+          },
+        },
+      },
+    });
+
+    return rolePermission;
+  };
+
+  return { assignPermissionToRole, getRolePermission };
 };

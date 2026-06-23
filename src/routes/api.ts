@@ -50,6 +50,12 @@ apiRoute.post(
   accessMiddleware("permission:edit"),
   permissionController.update,
 );
+apiRoute.get(
+  "/permission/:role_id",
+  authMiddleware,
+  accessMiddleware("permission:show"),
+  permissionController.show,
+);
 
 // Movie Routes
 apiRoute.get("/now-playing", movieController.getNowPlaying);
