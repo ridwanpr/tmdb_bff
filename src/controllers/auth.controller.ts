@@ -1,6 +1,8 @@
 import type { Request, Response } from "express";
 import type { AuthServiceType } from "../services/auth.service.js";
 import { loginSchema, signUpSchema } from "../schema/auth.schema.js";
+import type { AuthenticatedRequest } from "../middleware/auth.middleware.js";
+import { ResponseError } from "../exceptions/responseError.js";
 
 export const AuthController = (authService: AuthServiceType) => {
   const signUp = async (req: Request, res: Response) => {
@@ -48,5 +50,26 @@ export const AuthController = (authService: AuthServiceType) => {
     });
   };
 
-  return { signUp, login, logout };
+  const me = async (req: AuthenticatedRequest, res: Response) => {
+    const token = req.cookies?.session_token;
+    const user = req.user;
+
+    if (!user) {
+      throw new ResponseError(401, "Unauthorized");
+    }
+
+    const result = await authService.getCurrentUser(user.id, token);
+
+    if (!result) {
+      throw new ResponseError(401, "Unauthorized");
+    }
+
+    return res.json({
+      success: true,
+      message: "Get current user info success",
+      data: result,
+    });
+  };
+
+  return { signUp, login, logout, me };
 };

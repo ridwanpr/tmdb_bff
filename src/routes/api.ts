@@ -34,6 +34,7 @@ apiRoute.get("/", authMiddleware, (req, res) => {
 apiRoute.post("/register", authController.signUp);
 apiRoute.post("/login", authController.login);
 apiRoute.post("/logout", authMiddleware, authController.logout);
+apiRoute.get("/me", authMiddleware, authController.me);
 
 // Role Routes
 apiRoute.post("/role", authMiddleware, accessMiddleware("role:create"), roleController.store);

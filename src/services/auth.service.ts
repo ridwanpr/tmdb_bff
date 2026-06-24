@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { ResponseError } from "../exceptions/responseError.js";
-import type { User } from "../generated/prisma/client.js";
+import type { Session, User } from "../generated/prisma/client.js";
 import { prisma } from "../lib/prisma.js";
 import type { Login, SignUp } from "../schema/auth.schema.js";
 import { hashValue, verifyValue } from "../utils/hashing.js";
@@ -9,6 +9,7 @@ export type AuthServiceType = {
   registerUser: (data: SignUp) => Promise<Omit<User, "password">>;
   loginUser: (data: Login) => Promise<{ user: Omit<User, "password">; sessionToken: string }>;
   logoutUser: (token: string | undefined) => Promise<void>;
+  getCurrentUser: (userId: string, sessionToken: string) => Promise<Session | null>;
 };
 
 export const AuthService = (): AuthServiceType => {
@@ -96,5 +97,14 @@ export const AuthService = (): AuthServiceType => {
     });
   };
 
-  return { registerUser, loginUser, logoutUser };
+  const getCurrentUser = async (userId: string, sessionToken: string) => {
+    return await prisma.session.findFirst({
+      where: {
+        user_id: userId,
+        session_token: sessionToken,
+      },
+    });
+  };
+
+  return { registerUser, loginUser, logoutUser, getCurrentUser };
 };
