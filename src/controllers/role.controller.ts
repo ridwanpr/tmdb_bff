@@ -55,8 +55,7 @@ export const RoleController = (roleService: RoleServiceType) => {
   };
 
   const index = async (req: AuthenticatedRequest, res: Response) => {
-    const query = rolePaginateSchema.parse(req.params);
-
+    const query = rolePaginateSchema.parse(req.query);
     const { roles, meta } = await roleService.listRoles(query.page ?? 1, query.itemPerPage ?? 15);
 
     return res.json({
