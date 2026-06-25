@@ -4,7 +4,7 @@ import { loginSchema, signUpSchema } from "../schema/auth.schema.js";
 import type { AuthenticatedRequest } from "../middleware/auth.middleware.js";
 import { ResponseError } from "../exceptions/responseError.js";
 
-export const AuthController = (authService: AuthServiceType) => {
+export const AuthController = (authService: ReturnType<AuthServiceType>) => {
   const signUp = async (req: Request, res: Response) => {
     const body = signUpSchema.parse(req.body);
     const result = await authService.registerUser(body);

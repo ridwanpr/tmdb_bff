@@ -1,21 +1,10 @@
 import crypto from "crypto";
 import { ResponseError } from "../exceptions/responseError.js";
-import type { Session, User } from "../generated/prisma/client.js";
 import { prisma } from "../lib/prisma.js";
 import type { Login, SignUp } from "../schema/auth.schema.js";
 import { hashValue, verifyValue } from "../utils/hashing.js";
 
-export type AuthServiceType = {
-  registerUser: (data: SignUp) => Promise<Omit<User, "password">>;
-  loginUser: (data: Login) => Promise<{ user: Omit<User, "password">; sessionToken: string }>;
-  logoutUser: (token: string | undefined) => Promise<void>;
-  getCurrentUser: (
-    userId: string,
-    sessionToken: string,
-  ) => Promise<(Session & { user: Omit<User, "password"> }) | null>;
-};
-
-export const AuthService = (): AuthServiceType => {
+export const AuthService = () => {
   const registerUser = async (data: SignUp) => {
     const isUserExists = await prisma.user.findUnique({
       where: {
@@ -110,6 +99,20 @@ export const AuthService = (): AuthServiceType => {
         user: {
           omit: {
             password: true,
+            created_at: true,
+            updated_at: true,
+          },
+          include: {
+            userRoles: {
+              include: {
+                role: {
+                  omit: {
+                    created_at: true,
+                    updated_at: true,
+                  },
+                },
+              },
+            },
           },
         },
       },
@@ -118,3 +121,5 @@ export const AuthService = (): AuthServiceType => {
 
   return { registerUser, loginUser, logoutUser, getCurrentUser };
 };
+
+export type AuthServiceType = typeof AuthService;
