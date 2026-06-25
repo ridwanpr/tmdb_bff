@@ -9,7 +9,10 @@ export type AuthServiceType = {
   registerUser: (data: SignUp) => Promise<Omit<User, "password">>;
   loginUser: (data: Login) => Promise<{ user: Omit<User, "password">; sessionToken: string }>;
   logoutUser: (token: string | undefined) => Promise<void>;
-  getCurrentUser: (userId: string, sessionToken: string) => Promise<Session | null>;
+  getCurrentUser: (
+    userId: string,
+    sessionToken: string,
+  ) => Promise<(Session & { user: Omit<User, "password"> }) | null>;
 };
 
 export const AuthService = (): AuthServiceType => {
@@ -102,6 +105,13 @@ export const AuthService = (): AuthServiceType => {
       where: {
         user_id: userId,
         session_token: sessionToken,
+      },
+      include: {
+        user: {
+          omit: {
+            password: true,
+          },
+        },
       },
     });
   };
