@@ -110,6 +110,13 @@ export const AuthService = () => {
                     created_at: true,
                     updated_at: true,
                   },
+                  include: {
+                    rolePermissions: {
+                      include: {
+                        permission: true,
+                      },
+                    },
+                  },
                 },
               },
             },
