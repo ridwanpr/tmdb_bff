@@ -152,7 +152,7 @@ export const AuthService = () => {
     const roles = session.user.userRoles.map((ur) => ur.role.name);
 
     const permissions = session.user.userRoles.flatMap((ur) =>
-      ur.role.rolePermissions.map((rp) => rp.permission.name),
+      ur.role.rolePermissions.map((rp) => rp.permission.slug),
     );
 
     const uniquePermissions = [...new Set(permissions)];
