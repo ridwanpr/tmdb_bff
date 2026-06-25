@@ -4,6 +4,18 @@ import { prisma } from "../lib/prisma.js";
 import type { Login, SignUp } from "../schema/auth.schema.js";
 import { hashValue, verifyValue } from "../utils/hashing.js";
 
+export type FlatUserSession = {
+  session_token: string;
+  expires_at: Date;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    roles: string[];
+    permissions: string[];
+  };
+};
+
 export const AuthService = () => {
   const registerUser = async (data: SignUp) => {
     const isUserExists = await prisma.user.findUnique({
@@ -89,8 +101,11 @@ export const AuthService = () => {
     });
   };
 
-  const getCurrentUser = async (userId: string, sessionToken: string) => {
-    return await prisma.session.findFirst({
+  const getCurrentUser = async (
+    userId: string,
+    sessionToken: string,
+  ): Promise<FlatUserSession | null> => {
+    const session = await prisma.session.findFirst({
       where: {
         user_id: userId,
         session_token: sessionToken,
@@ -113,7 +128,12 @@ export const AuthService = () => {
                   include: {
                     rolePermissions: {
                       include: {
-                        permission: true,
+                        permission: {
+                          omit: {
+                            created_at: true,
+                            updated_at: true,
+                          },
+                        },
                       },
                     },
                   },
@@ -124,6 +144,30 @@ export const AuthService = () => {
         },
       },
     });
+
+    if (!session) {
+      return null;
+    }
+
+    const roles = session.user.userRoles.map((ur) => ur.role.name);
+
+    const permissions = session.user.userRoles.flatMap((ur) =>
+      ur.role.rolePermissions.map((rp) => rp.permission.name),
+    );
+
+    const uniquePermissions = [...new Set(permissions)];
+
+    return {
+      session_token: session.session_token,
+      expires_at: session.expires_at,
+      user: {
+        id: session.user.id,
+        name: session.user.name,
+        email: session.user.email,
+        roles: roles,
+        permissions: uniquePermissions,
+      },
+    };
   };
 
   return { registerUser, loginUser, logoutUser, getCurrentUser };
