@@ -3,8 +3,12 @@ import type { Role } from "../generated/prisma/client.js";
 import { ResponseError } from "../exceptions/responseError.js";
 import type { CreateRole, EditRole, RoleParams } from "../schema/role.schema.js";
 
-type PaginatedRoles = {
-  roles: Role[];
+export type RoleWithUserCount = Role & {
+  assigned_user_count: number;
+};
+
+export type PaginatedRoles = {
+  roles: RoleWithUserCount[];
   meta: {
     currentPage: number;
     itemPerPage: number;
@@ -85,18 +89,33 @@ export const RoleService = () => {
   };
 
   const listRoles = async (page: number, itemPerPage: number) => {
-    const [roles, totalItems] = await prisma.$transaction([
+    const [rolesData, totalItems] = await prisma.$transaction([
       prisma.role.findMany({
         skip: (page - 1) * itemPerPage,
         take: itemPerPage,
         orderBy: {
           id: "asc",
         },
+        include: {
+          _count: {
+            select: {
+              userRoles: true,
+            },
+          },
+        },
       }),
       prisma.role.count(),
     ]);
 
     const totalPages = Math.ceil(totalItems / itemPerPage);
+
+    const roles = rolesData.map((role) => {
+      const { _count, ...rest } = role;
+      return {
+        ...rest,
+        assigned_user_count: _count.userRoles,
+      };
+    });
 
     return {
       roles,
