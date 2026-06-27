@@ -20,7 +20,7 @@ export const rolePaginateSchema = z.object({
 });
 
 export const deleteRoleSchema = z.object({
-  role_id: z.uuid().nullish(),
+  role_id: z.string().nullish(),
 });
 
 export type CreateRole = z.infer<typeof createRoleSchema>;
