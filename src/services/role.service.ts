@@ -1,7 +1,7 @@
 import { prisma } from "../lib/prisma.js";
 import type { Role } from "../generated/prisma/client.js";
 import { ResponseError } from "../exceptions/responseError.js";
-import type { CreateRole, EditRole, RoleParams } from "../schema/role.schema.js";
+import type { CreateRole, DeleteRole, EditRole, RoleParams } from "../schema/role.schema.js";
 
 export type RoleWithUserCount = Role & {
   assigned_user_count: number;
@@ -15,14 +15,6 @@ export type PaginatedRoles = {
     totalItems: number;
     totalPages: number;
   };
-};
-
-export type RoleServiceType = {
-  createRole: (data: CreateRole) => Promise<Role>;
-  editRole: (param: RoleParams, data: EditRole) => Promise<Role>;
-  deleteRole: (param: RoleParams) => Promise<Role>;
-  findRole: (param: RoleParams) => Promise<Role>;
-  listRoles: (page: number, itemPerPage: number) => Promise<PaginatedRoles>;
 };
 
 export const RoleService = () => {
@@ -62,21 +54,47 @@ export const RoleService = () => {
     });
   };
 
-  const deleteRole = async (param: RoleParams) => {
-    const isSystemRole = await prisma.role.findUnique({
-      where: {
-        id: param.id,
-      },
-    });
+  const deleteRole = async (param: RoleParams, data: DeleteRole) => {
+    if (!data.role_id) {
+      const assignedUsersCount = await prisma.userRole.count({
+        where: { role_id: param.id },
+      });
 
-    if (isSystemRole?.is_system) {
-      throw new ResponseError(403, "System role can't be deleted");
+      if (assignedUsersCount > 0) {
+        throw new ResponseError(403, "Role deletion failed because of missing fallback role.");
+      }
     }
 
-    return await prisma.role.delete({
-      where: {
-        id: param.id,
-      },
+    return await prisma.$transaction(async (tx) => {
+      const isSystemRole = await tx.role.findUnique({
+        where: { id: param.id },
+      });
+
+      if (isSystemRole?.is_system) {
+        throw new ResponseError(403, "System role can't be deleted");
+      }
+
+      if (data.role_id) {
+        const assignedUser = await tx.userRole.findMany({
+          where: { role_id: param.id },
+          select: { user_id: true },
+        });
+
+        if (assignedUser.length > 0) {
+          const mapUserRole = assignedUser.map((user) => ({
+            user_id: user.user_id,
+            role_id: data.role_id!,
+          }));
+
+          await tx.userRole.createMany({
+            data: mapUserRole,
+          });
+        }
+      }
+
+      return await tx.role.delete({
+        where: { id: param.id },
+      });
     });
   };
 
@@ -130,3 +148,5 @@ export const RoleService = () => {
 
   return { createRole, editRole, deleteRole, findRole, listRoles };
 };
+
+export type RoleServiceType = typeof RoleService;

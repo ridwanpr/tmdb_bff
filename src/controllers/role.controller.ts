@@ -3,12 +3,13 @@ import type { AuthenticatedRequest } from "../middleware/auth.middleware.js";
 import type { RoleServiceType } from "../services/role.service.js";
 import {
   createRoleSchema,
+  deleteRoleSchema,
   editRoleSchema,
   rolePaginateSchema,
   roleParamsSchema,
 } from "../schema/role.schema.js";
 
-export const RoleController = (roleService: RoleServiceType) => {
+export const RoleController = (roleService: ReturnType<RoleServiceType>) => {
   const store = async (req: AuthenticatedRequest, res: Response) => {
     const body = createRoleSchema.parse(req.body);
     const result = await roleService.createRole(body);
@@ -35,7 +36,9 @@ export const RoleController = (roleService: RoleServiceType) => {
 
   const destroy = async (req: AuthenticatedRequest, res: Response) => {
     const params = roleParamsSchema.parse(req.params);
-    await roleService.deleteRole(params);
+    const body = deleteRoleSchema.parse(req.body);
+    
+    await roleService.deleteRole(params, body);
 
     return res.json({
       success: true,

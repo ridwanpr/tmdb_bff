@@ -39,8 +39,8 @@ apiRoute.get("/me", authMiddleware, authController.me);
 // Role Routes
 apiRoute.post("/role", authMiddleware, accessMiddleware("role:create"), roleController.store);
 apiRoute.put("/role/:id", authMiddleware, accessMiddleware("role:edit"), roleController.update);
-apiRoute.delete(
-  "/role/:id",
+apiRoute.post(
+  "/role/:id/delete-and-reassign",
   authMiddleware,
   accessMiddleware("role:delete"),
   roleController.destroy,
