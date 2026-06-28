@@ -3,7 +3,7 @@ import type { AuthenticatedRequest } from "../middleware/auth.middleware.js";
 import { assignPermissionSchema, rolePermissionParamSchema } from "../schema/permission.schema.js";
 import type { PermissionServiceType } from "../services/permission.service.js";
 
-export const PermissionController = (permissionService: PermissionServiceType) => {
+export const PermissionController = (permissionService: ReturnType<PermissionServiceType>) => {
   const update = async (req: AuthenticatedRequest, res: Response) => {
     const body = assignPermissionSchema.parse(req.body);
     const result = await permissionService.assignPermissionToRole(body);
