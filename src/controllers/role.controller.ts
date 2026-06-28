@@ -37,7 +37,7 @@ export const RoleController = (roleService: ReturnType<RoleServiceType>) => {
   const destroy = async (req: AuthenticatedRequest, res: Response) => {
     const params = roleParamsSchema.parse(req.params);
     const body = deleteRoleSchema.parse(req.body);
-    
+
     await roleService.deleteRole(params, body);
 
     return res.json({
@@ -69,5 +69,15 @@ export const RoleController = (roleService: ReturnType<RoleServiceType>) => {
     });
   };
 
-  return { store, update, destroy, show, index };
+  const roleListOption = async (req: AuthenticatedRequest, res: Response) => {
+    const result = await roleService.roleListOption();
+
+    return res.json({
+      success: true,
+      message: "Get role list option success",
+      data: result,
+    });
+  };
+
+  return { store, update, destroy, show, index, roleListOption };
 };

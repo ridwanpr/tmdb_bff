@@ -146,7 +146,16 @@ export const RoleService = () => {
     };
   };
 
-  return { createRole, editRole, deleteRole, findRole, listRoles };
+  const roleListOption = async () => {
+    return await prisma.role.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+  };
+
+  return { createRole, editRole, deleteRole, findRole, listRoles, roleListOption };
 };
 
 export type RoleServiceType = typeof RoleService;

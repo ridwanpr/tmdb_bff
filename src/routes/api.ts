@@ -47,6 +47,12 @@ apiRoute.post(
 );
 apiRoute.get("/role/:id", authMiddleware, accessMiddleware("role:show"), roleController.show);
 apiRoute.get("/role", authMiddleware, accessMiddleware("role:list"), roleController.index);
+apiRoute.get(
+  "/role-option",
+  authMiddleware,
+  accessMiddleware("role:list"),
+  roleController.roleListOption,
+);
 
 // Permission Routes
 apiRoute.post(
