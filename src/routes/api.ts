@@ -67,6 +67,12 @@ apiRoute.get(
   accessMiddleware("permission:show"),
   permissionController.show,
 );
+apiRoute.get(
+  "/permission-option",
+  authMiddleware,
+  accessMiddleware("permission:list"),
+  permissionController.permissionOption,
+);
 
 // Movie Routes
 apiRoute.get("/now-playing", movieController.getNowPlaying);

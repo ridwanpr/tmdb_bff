@@ -73,7 +73,11 @@ export const PermissionService = () => {
     };
   };
 
-  return { assignPermissionToRole, getRolePermission };
+  const getRolePermissionOption = async () => {
+    return await prisma.permission.findMany();
+  };
+
+  return { assignPermissionToRole, getRolePermission, getRolePermissionOption };
 };
 
 export type PermissionServiceType = typeof PermissionService;

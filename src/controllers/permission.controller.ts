@@ -26,5 +26,15 @@ export const PermissionController = (permissionService: ReturnType<PermissionSer
     });
   };
 
-  return { update, show };
+  const permissionOption = async (req: AuthenticatedRequest, res: Response) => {
+    const result = await permissionService.getRolePermissionOption();
+
+    return res.json({
+      success: true,
+      message: "Get permission option success",
+      data: result,
+    });
+  };
+
+  return { update, show, permissionOption };
 };
